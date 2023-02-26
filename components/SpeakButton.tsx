@@ -3,7 +3,10 @@ import { useEffect } from 'react';
 import useStore, { State } from 'store/store';
 import Image from 'next/image';
 
+// The minimum decibels that we want to capture
 const MIN_DECIBELS = -45;
+// The amount of time we wait before we cut the recording
+const MAX_PAUSE_DURATION = 1000;
 
 /**
  * AudioRecorder
@@ -24,6 +27,33 @@ const AudioRecorder = {
     AudioRecorder.mediaRecorder.addEventListener('dataavailable', (event) => {
       AudioRecorder.audioBlob.push(event.data);
     });
+
+    const audioContext = new AudioContext();
+    const audioStreamSource = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.minDecibels = MIN_DECIBELS;
+    audioStreamSource.connect(analyser);
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const detectSound = () => {
+      let soundDetected = false;
+
+      analyser.getByteFrequencyData(dataArray);
+
+      for (let i = 0; i < bufferLength; i++) {
+        if (dataArray[i] > 0) {
+          soundDetected = true;
+        }
+      }
+
+      console.log(soundDetected ? 'Sound detected' : 'No sound detected');
+
+      window.requestAnimationFrame(detectSound);
+    };
+
+    window.requestAnimationFrame(detectSound);
 
     AudioRecorder.mediaRecorder.start();
   },
@@ -47,7 +77,8 @@ const AudioRecorder = {
 };
 
 export default function SpeakButton() {
-  const { state, updateState } = useStore();
+  const { state, startIdling, startListening, startSpeaking, startThinking } =
+    useStore();
 
   useEffect(() => {
     switch (state) {
@@ -72,20 +103,20 @@ export default function SpeakButton() {
       onClick={() => {
         // Idle -> Listening
         if (state === State.IDLE) {
-          updateState();
+          startListening();
         }
 
         // Listening -> Thinking
         if (state === State.LISTENING) {
-          updateState();
+          startThinking();
 
           // TEST: Simulate thinking && Speaking
           setTimeout(() => {
-            updateState();
+            startSpeaking();
 
             // TEST: Simulate speaking
             setTimeout(() => {
-              updateState();
+              startIdling();
             }, 2000);
           }, 2000);
         }
