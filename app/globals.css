@@ -12,5 +12,11 @@ body {
   min-height: -webkit-fill-available;
 }
 
+@layer components {
+  .paper {
+    @apply border-black border-4 rounded-xl p-0.5;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
 }
