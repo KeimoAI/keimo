@@ -1,10 +1,14 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useStore, { State } from 'store/store';
 import Image from 'next/image';
 
 const MIN_DECIBELS = -45;
 
+/**
+ * AudioRecorder
+ * - Handles recording audio
+ */
 const AudioRecorder = {
   audioBlob: [] as Blob[],
   mediaRecorder: null as MediaRecorder | null,
@@ -92,6 +96,9 @@ export default function SpeakButton() {
   );
 }
 
+/**
+ * Renders the correct icon based on the state
+ */
 const renderIcon = (state: State) => {
   switch (state) {
     case State.LISTENING:

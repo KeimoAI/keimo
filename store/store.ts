@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+// Different Keimo states
 export enum State {
   IDLE,
   LISTENING,
@@ -9,9 +10,22 @@ export enum State {
 
 type StateT = State.IDLE | State.LISTENING | State.THINKING | State.SPEAKING;
 
+/**
+ * Zustand store for Keimo's state
+ */
 type Store = {
   state: StateT;
+  /**
+   * To change Keimo's state to a specific state
+   * @warning This function is not meant to be called directly, should be used for testing purposes only
+   * @param state {StateT} State to change to
+   * @returns {void}
+   */
   changeState: (state: StateT) => void;
+  /**
+   * State machine
+   * @returns {void}
+   */
   updateState: () => void;
 };
 
