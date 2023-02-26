@@ -15,43 +15,45 @@ type StateT = State.IDLE | State.LISTENING | State.THINKING | State.SPEAKING;
  */
 type Store = {
   state: StateT;
-  /**
-   * To change Keimo's state to a specific state
-   * @warning This function is not meant to be called directly, should be used for testing purposes only
-   * @param state {StateT} State to change to
-   * @returns {void}
-   */
-  changeState: (state: StateT) => void;
-  /**
-   * State machine
-   * @returns {void}
-   */
-  updateState: () => void;
+  startListening: () => void;
+  startThinking: () => void;
+  startSpeaking: () => void;
+  startIdling: () => void;
 };
 
 const useStore = create<Store>()((set) => ({
   state: State.IDLE,
-  changeState: (state: StateT) => set({ state }),
-  updateState: () =>
-    set((state) => {
-      let newState: StateT = state.state;
-
-      switch (state.state) {
-        case State.IDLE:
-          newState = State.LISTENING;
-          break;
-        case State.LISTENING:
-          newState = State.THINKING;
-          break;
-        case State.THINKING:
-          newState = State.SPEAKING;
-          break;
-        case State.SPEAKING:
-          newState = State.IDLE;
-          break;
+  startListening: () =>
+    set(({ state }) => {
+      if (state === State.IDLE) {
+        return { state: State.LISTENING };
       }
 
-      return { state: newState };
+      return {};
+    }),
+  startThinking: () =>
+    set(({ state }) => {
+      if (state === State.LISTENING) {
+        return { state: State.THINKING };
+      }
+
+      return {};
+    }),
+  startSpeaking: () =>
+    set(({ state }) => {
+      if (state === State.THINKING) {
+        return { state: State.SPEAKING };
+      }
+
+      return {};
+    }),
+  startIdling: () =>
+    set(({ state }) => {
+      if (state === State.SPEAKING) {
+        return { state: State.IDLE };
+      }
+
+      return {};
     }),
 }));
 
