@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Ellipsis from './Ellipsis';
+import TextScroller, { ScrollEdge } from './TextScroller';
 
 const OverflowIndicator = ({ className }: { className?: string }) => (
   <div className={`flex flex-col ${className}`}>
@@ -69,10 +71,20 @@ export default ({ text, resetTick, className, bubbleClassName }: Props) => {
     y: 40,
   };
 
+  const [isOverflow, setIsOverflow] = useState(false);
+  const [scrollEdge, setScrollEdge] = useState<ScrollEdge>();
+
   return (
     <div className={`flex flex-col items-center relative paper ${className}`}>
-      <OverflowIndicator className={`absolute top-1 right-1 left-1`} />
-      <p className="flex-1 w-full overflow-y-auto">{text}</p>
+      {isOverflow && scrollEdge !== 'top' && (
+        <OverflowIndicator className={`absolute top-1 right-1 left-1`} />
+      )}
+      <TextScroller
+        onOverflow={setIsOverflow}
+        onScrollEdge={setScrollEdge}
+        text={text}
+        className="flex-1 w-full overflow-y-auto"
+      />
       <Pointy
         borderWidth={borderWidth}
         pointOffset={pointOffset}
