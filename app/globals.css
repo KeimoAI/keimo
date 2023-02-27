@@ -14,7 +14,7 @@ body {
 
 @layer components {
   .paper {
-    @apply border-black border-4 rounded-xl p-0.5;
+    @apply border-black border-4 rounded-xl p-1;
   }
 }
 
