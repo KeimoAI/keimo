@@ -6,7 +6,8 @@ import Image from 'next/image';
 // The minimum decibels that we want to capture
 const MIN_DECIBELS = -45;
 // The amount of time we wait before we cut the recording
-const MAX_PAUSE_DURATION = 1000;
+const MAX_PAUSE_DURATION = 2000;
+const PAUSE_CHECK_INTERVAL = 500;
 
 /**
  * AudioRecorder
@@ -16,6 +17,10 @@ const AudioRecorder = {
   audioBlob: [] as Blob[],
   mediaRecorder: null as MediaRecorder | null,
   streamBeingCaptured: null as MediaStream | null,
+  recording: false,
+  pausedTime: 0,
+  interval: null as NodeJS.Timeout | null,
+  onSoundCallback: null as (() => void) | null,
 
   start: async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -48,31 +53,69 @@ const AudioRecorder = {
         }
       }
 
-      console.log(soundDetected ? 'Sound detected' : 'No sound detected');
+      // Start pause timer
+      if (!soundDetected) {
+        AudioRecorder.startTimer();
+      }
 
-      window.requestAnimationFrame(detectSound);
+      // Reset pause timer
+      if (soundDetected) {
+        AudioRecorder.pausedTime = 0;
+      }
+
+      // Don't request another animation frame if we're not recording
+      if (AudioRecorder.recording) {
+        window.requestAnimationFrame(detectSound);
+      }
     };
 
     window.requestAnimationFrame(detectSound);
 
+    AudioRecorder.recording = true;
     AudioRecorder.mediaRecorder.start();
   },
   stop: () => {
+    if (!AudioRecorder.recording) return;
+
     AudioRecorder.mediaRecorder?.addEventListener('stop', () => {
-      console.log('Recording stopped');
       const audioBlob = new Blob(AudioRecorder.audioBlob);
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+
+      if (AudioRecorder.onSoundCallback) {
+        AudioRecorder.onSoundCallback();
+      }
       audio.play();
     });
 
     AudioRecorder.cancel();
   },
   cancel: () => {
+    AudioRecorder.recording = false;
     AudioRecorder.mediaRecorder?.stop();
     AudioRecorder.streamBeingCaptured?.getTracks().forEach((track) => {
       track.stop();
     });
+    AudioRecorder.pausedTime = 0;
+    clearInterval(AudioRecorder.interval as NodeJS.Timeout);
+  },
+  // Starts a timer to cut the recording after a certain amount of time
+  startTimer: () => {
+    // Don't start a new timer if one is already running
+    if (AudioRecorder.interval) return;
+
+    // Start a new timer
+    AudioRecorder.interval = setInterval(() => {
+      AudioRecorder.pausedTime += PAUSE_CHECK_INTERVAL;
+
+      if (AudioRecorder.pausedTime >= MAX_PAUSE_DURATION) {
+        AudioRecorder.stop();
+      }
+    }, PAUSE_CHECK_INTERVAL);
+  },
+  // Callback for when sound is detected (On Result)
+  onSound: (callback: () => void) => {
+    AudioRecorder.onSoundCallback = callback;
   },
 };
 
@@ -86,9 +129,20 @@ export default function SpeakButton() {
         break;
       case State.LISTENING:
         AudioRecorder.start();
+        AudioRecorder.onSound(() => {
+          startThinking();
+
+          // TODO: Replace this with actual speech recognition
+          // Simulate thinking
+          setTimeout(() => {
+            startSpeaking();
+          }, 2000);
+          setTimeout(() => {
+            startIdling();
+          }, 4000);
+        });
         break;
       case State.THINKING:
-        AudioRecorder.stop();
         break;
     }
   }, [state]);
@@ -108,17 +162,7 @@ export default function SpeakButton() {
 
         // Listening -> Thinking
         if (state === State.LISTENING) {
-          startThinking();
-
-          // TEST: Simulate thinking && Speaking
-          setTimeout(() => {
-            startSpeaking();
-
-            // TEST: Simulate speaking
-            setTimeout(() => {
-              startIdling();
-            }, 2000);
-          }, 2000);
+          AudioRecorder.stop();
         }
       }}
     >
