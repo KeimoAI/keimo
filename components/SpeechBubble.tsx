@@ -60,7 +60,12 @@ export type Props = {
   bubbleClassName?: string;
 };
 
-export default ({ text, resetTick, className, bubbleClassName }: Props) => {
+const SpeechBubble = ({
+  text,
+  resetTick,
+  className,
+  bubbleClassName,
+}: Props) => {
   // TODO?: somehow extract borderWidth from paper class border width in pixels
   const borderWidth = 4; // tailwind border-4 == 4px
 
@@ -94,3 +99,5 @@ export default ({ text, resetTick, className, bubbleClassName }: Props) => {
     </div>
   );
 };
+
+export default SpeechBubble;
