@@ -12,7 +12,8 @@ export default function SpeakButton() {
     useKeimoStateStore();
 
   useEffect(() => {
-    recorder.onSound(() => {
+    recorder.onSound((sound) => {
+      console.log(sound);
       // TODO: Replace this with actual speech recognition
       // Simulate thinking, then speaking, then back to idling
       startThinking();
