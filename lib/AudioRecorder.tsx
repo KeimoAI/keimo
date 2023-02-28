@@ -105,7 +105,6 @@ const AudioRecorder = {
 
     // Start a new timer
     AudioRecorder.interval = setInterval(() => {
-      console.log('click');
       AudioRecorder.pausedTime += PAUSE_CHECK_INTERVAL;
 
       if (AudioRecorder.pausedTime >= MAX_PAUSE_DURATION) {
