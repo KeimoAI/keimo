@@ -1,4 +1,4 @@
-export default ({
+const Ellipsis = ({
   className,
   width,
 }: {
@@ -21,3 +21,5 @@ export default ({
     </svg>
   );
 };
+
+export default Ellipsis;

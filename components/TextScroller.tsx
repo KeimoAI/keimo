@@ -26,7 +26,7 @@ export type Props = {
   onScrollEdge?: (edge: ScrollEdge) => void;
 };
 
-export default ({ text, className, onOverflow, onScrollEdge }: Props) => {
+const TextScroller = ({ text, className, onOverflow, onScrollEdge }: Props) => {
   const ref = useRef<HTMLParagraphElement>(null);
   const [scrollEdge, setScrollEdge] = useState<ScrollEdge>();
   const [isOverflow, setIsOverflow] = useState<boolean>();
@@ -84,3 +84,5 @@ export default ({ text, className, onOverflow, onScrollEdge }: Props) => {
     </p>
   );
 };
+
+export default TextScroller;
