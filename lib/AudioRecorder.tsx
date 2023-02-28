@@ -1,4 +1,7 @@
-type SoundCallBack = () => void;
+import { useCallback, useRef, useState } from 'react';
+
+// The type of the callback function
+type onSoundCallBack = () => void;
 
 // The minimum decibels that we want to capture
 const MIN_DECIBELS = -45;
@@ -12,24 +15,74 @@ const PAUSE_CHECK_INTERVAL = 500;
  * - Handles recording audio
  * - Detects when user is done "speaking"
  */
-const AudioRecorder = {
-  audioBlob: [] as Blob[],
-  mediaRecorder: null as MediaRecorder | null,
-  streamBeingCaptured: null as MediaStream | null,
-  recording: false,
-  pausedTime: 0,
-  interval: null as NodeJS.Timeout | null | void,
-  onSoundCallback: null as (() => void) | null,
+export default function useAudioRecorder() {
+  const streamBeingCaptured = useRef<MediaStream | null>(null);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const audioBlobs = useRef<Blob[]>([]);
+  const pausedTime = useRef(0);
+  const pauseInterval = useRef<NodeJS.Timeout | null>(null);
+  const onSoundCallback = useRef<onSoundCallBack | null>(null);
+  const recording = useRef(false);
 
-  start: async () => {
+  // Stops the recording, calls the callback, and resets all the properties
+  const stop = useCallback(() => {
+    if (!recording.current) return;
+    recording.current = false;
+
+    // TODO: Remove audio playback, return the audio blob instead (Base64?)
+    mediaRecorder.current?.addEventListener('stop', () => {
+      const audioBlob = new Blob(audioBlobs.current);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      if (onSoundCallback.current) {
+        onSoundCallback.current();
+      }
+
+      audio.play();
+    });
+
+    mediaRecorder.current?.stop();
+    streamBeingCaptured.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
+
+    clearInterval(pauseInterval.current as NodeJS.Timeout);
+    pauseInterval.current = null;
+    pausedTime.current = 0;
+  }, [recording]);
+
+  // Callback for when sound is detected (On Result)
+  const onSound = useCallback((callback: onSoundCallBack) => {
+    onSoundCallback.current = callback;
+  }, []);
+
+  // Starts a timer to cut the recording after a certain amount of time
+  const startTimer = useCallback(() => {
+    // Don't start a new timer if one is already running
+    if (pauseInterval.current || !recording.current) return;
+
+    // Start a new timer
+    pauseInterval.current = setInterval(() => {
+      pausedTime.current += PAUSE_CHECK_INTERVAL;
+
+      if (pausedTime.current >= MAX_PAUSE_DURATION) {
+        stop();
+      }
+    }, PAUSE_CHECK_INTERVAL);
+  }, [recording, stop]);
+
+  const start = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    AudioRecorder.streamBeingCaptured = stream;
-    AudioRecorder.mediaRecorder = new MediaRecorder(stream);
-    AudioRecorder.audioBlob = [];
+    streamBeingCaptured.current = stream;
+    mediaRecorder.current = new MediaRecorder(stream);
+    audioBlobs.current = [];
 
-    AudioRecorder.mediaRecorder.addEventListener('dataavailable', (event) => {
-      AudioRecorder.audioBlob.push(event.data);
+    mediaRecorder.current.addEventListener('dataavailable', (event) => {
+      if (event.data && event.data.size > 0) {
+        audioBlobs.current.push(event.data);
+      }
     });
 
     const audioContext = new AudioContext();
@@ -54,68 +107,29 @@ const AudioRecorder = {
 
       // Start pause timer
       if (!soundDetected) {
-        AudioRecorder.startTimer();
+        startTimer();
       }
 
       // Reset pause timer
       if (soundDetected) {
-        AudioRecorder.pausedTime = 0;
+        pausedTime.current = 0;
       }
 
       // Don't request another animation frame if we're not recording
-      if (AudioRecorder.recording) {
+      if (recording.current) {
         window.requestAnimationFrame(detectSound);
       }
     };
 
+    recording.current = true;
+    mediaRecorder.current.start();
+
     window.requestAnimationFrame(detectSound);
+  }, [recording, startTimer]);
 
-    AudioRecorder.recording = true;
-    AudioRecorder.mediaRecorder.start();
-  },
-  // Stops the recording, calls the callback, and resets all the properties
-  stop: () => {
-    if (!AudioRecorder.recording) return;
-    AudioRecorder.recording = false;
-
-    AudioRecorder.mediaRecorder?.addEventListener('stop', () => {
-      const audioBlob = new Blob(AudioRecorder.audioBlob);
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-
-      if (AudioRecorder.onSoundCallback) {
-        AudioRecorder.onSoundCallback();
-      }
-      audio.play();
-    });
-
-    AudioRecorder.mediaRecorder?.stop();
-    AudioRecorder.streamBeingCaptured?.getTracks().forEach((track) => {
-      track.stop();
-    });
-
-    clearInterval(AudioRecorder.interval as NodeJS.Timeout);
-    AudioRecorder.interval = null;
-    AudioRecorder.pausedTime = 0;
-  },
-  // Starts a timer to cut the recording after a certain amount of time
-  startTimer: () => {
-    // Don't start a new timer if one is already running
-    if (AudioRecorder.interval || !AudioRecorder.recording) return;
-
-    // Start a new timer
-    AudioRecorder.interval = setInterval(() => {
-      AudioRecorder.pausedTime += PAUSE_CHECK_INTERVAL;
-
-      if (AudioRecorder.pausedTime >= MAX_PAUSE_DURATION) {
-        AudioRecorder.stop();
-      }
-    }, PAUSE_CHECK_INTERVAL);
-  },
-  // Callback for when sound is detected (On Result)
-  onSound: (callback: () => void) => {
-    AudioRecorder.onSoundCallback = callback;
-  },
-};
-
-export default AudioRecorder;
+  return {
+    start,
+    stop,
+    onSound,
+  };
+}
