@@ -1,7 +1,7 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
 // The type of the callback function
-type onSoundCallBack = () => void;
+type onSoundCallBack = (audioString: string) => void;
 
 // The minimum decibels that we want to capture
 const MIN_DECIBELS = -45;
@@ -9,6 +9,8 @@ const MIN_DECIBELS = -45;
 const MAX_PAUSE_DURATION = 2000;
 // The interval at which we check for sound
 const PAUSE_CHECK_INTERVAL = 500;
+// File Type
+const FILE_TYPE = 'audio/webm';
 
 /**
  * AudioRecorder
@@ -31,15 +33,16 @@ export default function useAudioRecorder() {
 
     // TODO: Remove audio playback, return the audio blob instead (Base64?)
     mediaRecorder.current?.addEventListener('stop', () => {
-      const audioBlob = new Blob(audioBlobs.current);
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      const audioBlob = new Blob(audioBlobs.current, { type: FILE_TYPE });
 
-      if (onSoundCallback.current) {
-        onSoundCallback.current();
-      }
-
-      audio.play();
+      let reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = function () {
+        const base64data = reader.result as string;
+        if (onSoundCallback.current) {
+          onSoundCallback.current(base64data);
+        }
+      };
     });
 
     mediaRecorder.current?.stop();
@@ -76,7 +79,9 @@ export default function useAudioRecorder() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
     streamBeingCaptured.current = stream;
-    mediaRecorder.current = new MediaRecorder(stream);
+    mediaRecorder.current = new MediaRecorder(stream, {
+      mimeType: FILE_TYPE,
+    });
     audioBlobs.current = [];
 
     mediaRecorder.current.addEventListener('dataavailable', (event) => {
