@@ -1,3 +1,5 @@
+type SoundCallBack = () => void;
+
 // The minimum decibels that we want to capture
 const MIN_DECIBELS = -45;
 // The amount of time we wait before we cut the recording
@@ -16,7 +18,7 @@ const AudioRecorder = {
   streamBeingCaptured: null as MediaStream | null,
   recording: false,
   pausedTime: 0,
-  interval: null as NodeJS.Timeout | null,
+  interval: null as NodeJS.Timeout | null | void,
   onSoundCallback: null as (() => void) | null,
 
   start: async () => {
@@ -71,8 +73,10 @@ const AudioRecorder = {
     AudioRecorder.recording = true;
     AudioRecorder.mediaRecorder.start();
   },
+  // Stops the recording, calls the callback, and resets all the properties
   stop: () => {
     if (!AudioRecorder.recording) return;
+    AudioRecorder.recording = false;
 
     AudioRecorder.mediaRecorder?.addEventListener('stop', () => {
       const audioBlob = new Blob(AudioRecorder.audioBlob);
@@ -85,24 +89,23 @@ const AudioRecorder = {
       audio.play();
     });
 
-    AudioRecorder.cancel();
-  },
-  cancel: () => {
-    AudioRecorder.recording = false;
     AudioRecorder.mediaRecorder?.stop();
     AudioRecorder.streamBeingCaptured?.getTracks().forEach((track) => {
       track.stop();
     });
-    AudioRecorder.pausedTime = 0;
+
     clearInterval(AudioRecorder.interval as NodeJS.Timeout);
+    AudioRecorder.interval = null;
+    AudioRecorder.pausedTime = 0;
   },
   // Starts a timer to cut the recording after a certain amount of time
   startTimer: () => {
     // Don't start a new timer if one is already running
-    if (AudioRecorder.interval) return;
+    if (AudioRecorder.interval || !AudioRecorder.recording) return;
 
     // Start a new timer
     AudioRecorder.interval = setInterval(() => {
+      console.log('click');
       AudioRecorder.pausedTime += PAUSE_CHECK_INTERVAL;
 
       if (AudioRecorder.pausedTime >= MAX_PAUSE_DURATION) {

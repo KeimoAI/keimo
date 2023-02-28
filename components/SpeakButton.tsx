@@ -14,6 +14,7 @@ export default function SpeakButton() {
     AudioRecorder.onSound(() => {
       // TODO: Replace this with actual speech recognition
       // Simulate thinking, then speaking, then back to idling
+      startThinking();
       setTimeout(() => {
         startSpeaking();
       }, 2000);
@@ -21,7 +22,6 @@ export default function SpeakButton() {
         startIdling();
       }, 4000);
     });
-    startThinking();
   }, []);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function SpeakButton() {
   return (
     <button
       className={`
-        h-16 w-16 flex justify-center items-center border-black border-2 rounded-xl bg-green transition-colors duration-200 ease-in
+        h-16 w-16 flex justify-center items-center paper bg-green transition-colors duration-200 ease-in
         ${state === State.LISTENING && 'bg-red-500'}
         ${state === State.THINKING && 'bg-purple'}
       `}
