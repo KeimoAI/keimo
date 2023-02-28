@@ -21,7 +21,7 @@ type Store = {
   startIdling: () => void;
 };
 
-const useStore = create<Store>()((set) => ({
+const useKeimoStateStore = create<Store>()((set) => ({
   state: State.IDLE,
   startListening: () =>
     set(({ state }) => {
@@ -57,4 +57,4 @@ const useStore = create<Store>()((set) => ({
     }),
 }));
 
-export default useStore;
+export default useKeimoStateStore;

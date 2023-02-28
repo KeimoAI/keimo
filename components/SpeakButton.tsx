@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import useStore, { State } from 'store/store';
+import useKeimoStore, { State } from 'store/keimoStateStore';
 import Image from 'next/image';
 
 import AudioRecorder from 'lib/AudioRecorder';
 
 export default function SpeakButton() {
   const { state, startIdling, startListening, startSpeaking, startThinking } =
-    useStore();
+    useKeimoStore();
 
   useEffect(() => {
     AudioRecorder.onSound(() => {
