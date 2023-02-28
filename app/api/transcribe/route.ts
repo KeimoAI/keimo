@@ -1,8 +1,9 @@
 import { exec } from "child_process";
-export async function POST(req: Request) {
+
+export async function GET() {
     return new Response(
         await new Promise((resolve, reject) => {
-            exec(`whisper /tmp/small-tesla.mp3 --model tiny --language English`, (err, stdout, stderr) => {
+            exec(`sudo whisper /tmp/small-tesla.mp3 --fp16 False --model tiny --language English -f txt > /dev/null && cat small-tesla.mp3.txt`, (err, stdout, stderr) => {
                 if (err) {
                     resolve(err.name);
                 } else {
