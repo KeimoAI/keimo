@@ -53,6 +53,21 @@ const Pointy = ({
   );
 };
 
+const DimmedStack = () => (
+  <>
+    <div
+      className={`flex items-stretch flex-none -mb-5 h-8 p-0 paper bg-white z-0`}
+    >
+      <div className={`bg-black flex-1 opacity-50`} />
+    </div>
+    <div
+      className={`flex items-stretch flex-none -mb-5 h-8 p-0 paper bg-white z-0`}
+    >
+      <div className={`bg-black flex-1 opacity-30`} />
+    </div>
+  </>
+);
+
 export type Props = {
   text: string;
   resetTick: number;
@@ -80,22 +95,28 @@ const SpeechBubble = ({
   const [scrollEdge, setScrollEdge] = useState<ScrollEdge>();
 
   return (
-    <div className={`flex flex-col items-center relative paper ${className}`}>
-      {isOverflow && scrollEdge !== 'top' && (
-        <OverflowIndicator className={`absolute top-1 right-1 left-1`} />
-      )}
-      <TextScroller
-        onOverflow={setIsOverflow}
-        onScrollEdge={setScrollEdge}
-        text={text}
-        className="flex-1 w-full overflow-y-auto"
-      />
-      <Pointy
-        borderWidth={borderWidth}
-        pointOffset={pointOffset}
-        pointWidth={pointWidth}
-        pointTarget={pointTarget}
-      />
+    <div className={`flex flex-col min-h-0 ${className}`}>
+      <DimmedStack />
+
+      <div
+        className={`flex flex-col min-h-0 items-center relative paper bg-white z-20 ${bubbleClassName}`}
+      >
+        {isOverflow && scrollEdge !== 'top' && (
+          <OverflowIndicator className={`absolute top-1 right-1 left-1`} />
+        )}
+        <TextScroller
+          onOverflow={setIsOverflow}
+          onScrollEdge={setScrollEdge}
+          text={text}
+          className="flex-1 w-full overflow-y-auto"
+        />
+        <Pointy
+          borderWidth={borderWidth}
+          pointOffset={pointOffset}
+          pointWidth={pointWidth}
+          pointTarget={pointTarget}
+        />
+      </div>
     </div>
   );
 };
