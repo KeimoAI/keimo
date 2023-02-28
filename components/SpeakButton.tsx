@@ -1,17 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
-import useKeimoStore, { State } from 'store/keimoStateStore';
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 
-import AudioRecorder from 'lib/AudioRecorder';
+import useKeimoStateStore, { State } from 'store/keimoStateStore';
+import useAudioRecorder from 'lib/AudioRecorder';
 
 export default function SpeakButton() {
+  const recorder = useAudioRecorder();
   const { state, startIdling, startListening, startSpeaking, startThinking } =
-    useKeimoStore();
+    useKeimoStateStore();
 
   useEffect(() => {
-    AudioRecorder.onSound(() => {
+    recorder.onSound(() => {
       // TODO: Replace this with actual speech recognition
       // Simulate thinking, then speaking, then back to idling
       startThinking();
@@ -28,7 +29,7 @@ export default function SpeakButton() {
     switch (state) {
       // Whenever the state changes to listening, start recording
       case State.LISTENING:
-        AudioRecorder.start();
+        recorder.start();
         break;
     }
   }, [state]);
@@ -43,7 +44,7 @@ export default function SpeakButton() {
     // Listening -> Thinking
     // Stop recording and start thinking :)
     if (state === State.LISTENING) {
-      AudioRecorder.stop();
+      recorder.stop();
     }
   };
 
