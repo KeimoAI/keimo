@@ -6,7 +6,9 @@ import Image from 'next/image';
 import useKeimoStateStore, { State } from 'store/keimoStateStore';
 import useAudioRecorder from 'lib/AudioRecorder';
 
-export default function SpeakButton() {
+export type Props = { className?: string };
+
+export default function SpeakButton({ className }: Props) {
   const recorder = useAudioRecorder();
   const { state, startIdling, startListening, startSpeaking, startThinking } =
     useKeimoStateStore();
@@ -55,6 +57,7 @@ export default function SpeakButton() {
         h-16 w-16 flex justify-center items-center paper bg-green transition-colors duration-200 ease-in
         ${state === State.LISTENING && 'bg-red-500'}
         ${state === State.THINKING && 'bg-purple'}
+        ${className}
       `}
       onClick={handleClick}
     >
