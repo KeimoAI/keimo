@@ -14,11 +14,25 @@ export default function SpeakButton({ className }: Props) {
     useKeimoStateStore();
 
   useEffect(() => {
-    recorder.onSound((sound) => {
-      console.log(sound);
+    recorder.onSound(async (sound) => {
       // TODO: Replace this with actual speech recognition
       // Simulate thinking, then speaking, then back to idling
+      console.log(sound);
       startThinking();
+      let result;
+      try {
+        result = await fetch('/api/transcribe', {
+          method: 'POST',
+          body: JSON.stringify({ sound }),
+        });
+      } catch (error) {
+        console.error(error);
+      }
+
+      const { transcript } = await result?.json();
+
+      console.log(transcript);
+
       setTimeout(() => {
         startSpeaking();
       }, 2000);
