@@ -32,14 +32,18 @@ const Pointy = ({
 }: {
   pointTarget: { x: number; y: number };
   pointWidth: number;
-  pointOffset: number;
+  pointOffset: { right: number } | { left: number };
   borderWidth: number;
   bgColor: BgColor;
 }) => {
   const dims = {
-    w: Math.abs(pointTarget.x + borderWidth / 2),
-    h: Math.abs(pointTarget.y + borderWidth / 2),
+    w: Math.abs(pointTarget.x) + borderWidth,
+    h: Math.abs(pointTarget.y) + borderWidth,
   };
+
+  // Shift all x coords by this amount to make them positive
+  const negativeXAdjust = -Math.min(0, pointTarget.x);
+  dims.w += negativeXAdjust;
 
   const fill = {
     white: 'fill-white',
@@ -57,11 +61,19 @@ const Pointy = ({
       className={`absolute ${fill} stroke-black`}
       style={{
         top: '100%',
-        right: `calc(${rightBasis}px + ${pointOffset}rem)`,
+        ...('right' in pointOffset
+          ? {
+              right: `calc(${rightBasis}px + ${pointOffset.right}rem - ${negativeXAdjust}px)`,
+            }
+          : {
+              left: `calc(${pointOffset.left}rem - ${negativeXAdjust}px)`,
+            }),
       }}
     >
       <polyline
-        points={`0, 0 ${pointTarget.x}, ${pointTarget.y} ${pointWidth}, 0`}
+        points={`${negativeXAdjust}, 0 ${pointTarget.x + negativeXAdjust}, ${
+          pointTarget.y
+        } ${negativeXAdjust + pointWidth}, 0`}
         strokeLinejoin="round"
         strokeLinecap="round"
         strokeWidth={borderWidth}
@@ -97,6 +109,11 @@ export type Props = {
   className?: string;
   bubbleClassName?: string;
   bgColor?: BgColor;
+  point?: {
+    target: { x: number; y: number };
+    offset: { left: number } | { right: number };
+    width: number;
+  };
 };
 
 const SpeechBubble = ({
@@ -105,6 +122,7 @@ const SpeechBubble = ({
   className,
   bubbleClassName,
   bgColor,
+  point,
 }: Props) => {
   bgColor = bgColor ?? 'white';
   const bg = {
@@ -114,13 +132,6 @@ const SpeechBubble = ({
 
   // TODO?: somehow extract borderWidth from paper class border width in pixels
   const borderWidth = 4; // tailwind border-4 == 4px
-
-  const pointOffset = 1;
-  const pointWidth = 40;
-  const pointTarget = {
-    x: 80,
-    y: 40,
-  };
 
   const [isOverflow, setIsOverflow] = useState(false);
   const [scrollEdge, setScrollEdge] = useState<ScrollEdge>();
@@ -146,9 +157,9 @@ const SpeechBubble = ({
         />
         <Pointy
           borderWidth={borderWidth}
-          pointOffset={pointOffset}
-          pointWidth={pointWidth}
-          pointTarget={pointTarget}
+          pointOffset={point?.offset ?? { left: 1 }}
+          pointWidth={point?.width ?? 40}
+          pointTarget={point?.target ?? { x: 80, y: 40 }}
           bgColor={bgColor}
         />
       </div>
