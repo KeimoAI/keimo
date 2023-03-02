@@ -17,7 +17,6 @@ export default function SpeakButton({ className }: Props) {
         recorder.onSound(async (sound) => {
             // TODO: Replace this with actual speech recognition
             // Simulate thinking, then speaking, then back to idling
-            // console.log(sound);
             startThinking();
             let res;
             try {
@@ -30,17 +29,14 @@ export default function SpeakButton({ className }: Props) {
                 console.error(error);
             }
 
-            // HOW TO DECODE PROPERLY
             res = (await res?.json());
             const res_bin = atob(res);
             var res_bytes = new Uint8Array(res_bin.length);
             for (var i = 0; i < res_bin.length; i++) {
                 res_bytes[i] = res_bin.charCodeAt(i);
             }
-            // console.log(result_decoded)
-            const audioBlob = new Blob([res_bytes], { type: "audio/mp3" });
+            const audioBlob = new Blob([res_bytes], { type: "audio/ogg" });
             const audioUrl = URL.createObjectURL(audioBlob);
-            console.log(audioUrl);
             const audio = new Audio(audioUrl);
             audio.play()
 

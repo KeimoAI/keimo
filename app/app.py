@@ -11,7 +11,7 @@ voice = texttospeech.VoiceSelectionParams(
     language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
 )
 audio_config = texttospeech.AudioConfig(
-    audio_encoding=texttospeech.AudioEncoding.MP3 # IS THERE THE RIGHT FORMAT?
+    audio_encoding=texttospeech.AudioEncoding.OGG_OPUS
 )
 
 CONVERSATION = [
@@ -19,7 +19,6 @@ CONVERSATION = [
 ]
 
 app = Flask(__name__)
-
 
 
 @app.route("/api/process-data", methods=["POST"])
@@ -52,5 +51,4 @@ def process_data():
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
 
-    # print(response_voice.audio_content)
     return jsonify(base64.b64encode(response_voice.audio_content).decode("utf-8"))
