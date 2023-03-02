@@ -1,9 +1,18 @@
+'use client';
 import Keimo from 'components/Keimo';
 import SpeakButton from 'components/SpeakButton';
 import SpeechBubble from 'components/SpeechBubble';
+import Image from 'next/image';
+import useKeimoStateStore from 'store/keimoStateStore';
+import { shallow } from 'zustand/shallow';
 import styles from './page.module.css';
 
 export default function Home() {
+  const [userMsg, keimoMsg] = useKeimoStateStore(
+    (store) => [store.dialog.current.userMsg, store.dialog.current.keimoMsg],
+    shallow
+  );
+
   return (
     <main className={`${styles.main} bg-blue h-full flex min-w-0 content-end`}>
       <Keimo className="self-end" width={600} />
@@ -15,7 +24,10 @@ export default function Home() {
             width: 50,
             target: { x: -40, y: 40 },
           }}
-          text={'test'}
+          text={
+            // TODO: have special bubble state for empty msg
+            keimoMsg ?? ''
+          }
           resetTick={0}
         />
         <SpeechBubble
@@ -26,7 +38,7 @@ export default function Home() {
             target: { x: 80, y: 40 },
           }}
           bgColor="green"
-          text={'test'}
+          text={userMsg ?? ''}
           resetTick={0}
         />
         <SpeakButton className="self-end" />
