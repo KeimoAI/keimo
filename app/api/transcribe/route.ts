@@ -31,18 +31,14 @@ export async function POST(request: Request) {
     console.log("FINISH")
 
     if (!result) {
-        return new Response('No transcription', { status: 400 });
+        return new Response('No response', { status: 400 });
     }
 
-    const ttsRequest = {
-        input: { text: result },
-        voice: { languageCode: 'en-US', ssmlGender: 'FEMALE' },
-        audioConfig: { audioEncoding: 'OGG_OPUS' },
-    }
-    const [ttsResponse] = await client.synthesizeSpeech(ttsRequest);
-    const audioBlob = new Blob([ttsResponse], { type: "audio/ogg" });
+    const audioBlob = new Blob([result], { type: "audio/mp3" });
     const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
     console.log(audioUrl)
+    audio.play();
 
 
     return new Response(JSON.stringify({ audioUrl }));
