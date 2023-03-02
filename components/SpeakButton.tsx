@@ -72,14 +72,14 @@ export default function SpeakButton({ className }: Props) {
     });
   }, [setUserMsg, setKeimoMsg]);
 
-  useEffect(() => {
-    switch (state) {
-      // Whenever the state changes to listening, start recording
-      case State.LISTENING:
-        recorder.start();
-        break;
-    }
-  }, [state]);
+    useEffect(() => {
+        switch (state) {
+            // Whenever the state changes to listening, start recording
+            case State.LISTENING:
+                recorder.start();
+                break;
+        }
+    }, [state]);
 
   const handleClick = () => {
     // Idle -> Listening
@@ -95,26 +95,26 @@ export default function SpeakButton({ className }: Props) {
       console.log(state);
     }
 
-    // Listening -> Thinking
-    // Stop recording and start thinking :)
-    if (state === State.LISTENING) {
-      recorder.stop();
-    }
-  };
+        // Listening -> Thinking
+        // Stop recording and start thinking :)
+        if (state === State.LISTENING) {
+            recorder.stop();
+        }
+    };
 
-  return (
-    <button
-      className={`
+    return (
+        <button
+            className={`
         h-16 w-16 flex justify-center items-center paper bg-green transition-colors duration-200 ease-in
         ${state === State.LISTENING && 'bg-red-500'}
         ${state === State.THINKING && 'bg-purple'}
         ${className}
       `}
-      onClick={handleClick}
-    >
-      {renderIcon(state)}
-    </button>
-  );
+            onClick={handleClick}
+        >
+            {renderIcon(state)}
+        </button>
+    );
 }
 
 /**
