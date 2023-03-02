@@ -1,8 +1,18 @@
 @media (prefers-color-scheme: dark) {
 }
 
-.main {
+.bg::after {
+  content: '';
+  height: 200%;
+  width: 200%;
   background-image: url('/images/background-pattern-black.png');
   background-repeat: repeat;
   background-size: 128px 128px;
+  transform: rotate(-30deg) translateY(-50%);
+  opacity: 50%;
+  position: absolute;
+}
+
+.bg {
+  mask-image: linear-gradient(rgba(0, 0, 0, 1) 0%, transparent 70%);
 }
