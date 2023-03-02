@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { shallow } from 'zustand/shallow';
 
 import useKeimoStateStore, { State } from 'store/keimoStateStore';
 import useAudioRecorder from 'lib/AudioRecorder';
@@ -10,8 +11,17 @@ export type Props = { className?: string };
 
 export default function SpeakButton({ className }: Props) {
   const recorder = useAudioRecorder();
-  const { state, startIdling, startListening, startSpeaking, startThinking } =
-    useKeimoStateStore();
+  const [state, startIdling, startListening, startSpeaking, startThinking] =
+    useKeimoStateStore(
+      (store) => [
+        store.state,
+        store.startIdling,
+        store.startListening,
+        store.startSpeaking,
+        store.startThinking,
+      ],
+      shallow
+    );
 
   useEffect(() => {
     recorder.onSound(async (sound) => {
