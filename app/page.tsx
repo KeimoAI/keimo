@@ -14,7 +14,10 @@ export default function Home() {
   );
 
   return (
-    <main className={`${styles.main} bg-blue h-full flex min-w-0 content-end`}>
+    <main className={`${styles.main} relative h-full flex min-w-0 content-end`}>
+      <div
+        className={`${styles.bg} w-full h-full absolute -z-50 overflow-hidden`}
+      />
       <Keimo className="self-end" width={600} />
       <div className="w-full flex-1 flex flex-col justify-end pb-6 pr-6">
         <SpeechBubble
