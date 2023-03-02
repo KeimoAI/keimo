@@ -11,14 +11,12 @@ import idleAnimation from 'public/animations/keimo-idle.json';
 
 export default function Keimo({
   width = 300,
-  height = 300,
   className,
 }: {
   width?: number;
-  height?: number;
   className?: string;
 }) {
-  const { state } = useKeimoStateStore();
+  const state = useKeimoStateStore((store) => store.state);
   const [animation, setAnimation] = useState(idleAnimation);
   const keimoRef = useRef(null);
 
@@ -45,13 +43,20 @@ export default function Keimo({
   }, [state]);
 
   return (
-    <Player
-      className={className}
-      ref={keimoRef}
-      autoplay
-      loop
-      src={animation}
-      style={{ height, width }}
-    />
+    <div className={`${className}`}>
+      <Player
+        ref={keimoRef}
+        autoplay
+        loop
+        src={animation}
+        style={{
+          width,
+          marginTop: -width / 2,
+          marginLeft: `-${(80 * width) / 600}px`,
+          marginRight: `-${(140 * width) / 600}px`,
+          overflowY: 'hidden',
+        }}
+      />
+    </div>
   );
 }
