@@ -1,16 +1,57 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
+import useKeimoStateStore, { State } from 'store/keimoStateStore';
 
-export default function Keimo() {
+import idleAnimation from 'public/animations/keimo-idle.json';
+// import listeningAnimation from 'public/animations/keimo-listening.json';
+// import thinkingAnimation from 'public/animations/keimo-thinking.json';
+// import speakingAnimation from 'public/animations/keimo-speaking.json';
+
+export default function Keimo({
+  width = 300,
+  height = 300,
+  className,
+}: {
+  width?: number;
+  height?: number;
+  className?: string;
+}) {
+  const { state } = useKeimoStateStore();
+  const [animation, setAnimation] = useState(idleAnimation);
+  const keimoRef = useRef(null);
+
+  useEffect(() => {
+    if (!keimoRef.current) return;
+
+    switch (state) {
+      case State.IDLE:
+        setAnimation(idleAnimation);
+        break;
+
+      case State.LISTENING:
+        // setAnimation(listeningAnimation);
+        break;
+
+      case State.THINKING:
+        // setAnimation(thinkingAnimation);
+        break;
+
+      case State.SPEAKING:
+        // setAnimation(speakingAnimation);
+        break;
+    }
+  }, [state]);
+
   return (
-    <div className="w-[300px] h-[300px]">
-      <Player
-        autoplay
-        loop
-        src="/animations/keimo-idle.json"
-        style={{ height: '300px', width: '300px' }}
-      />
-    </div>
+    <Player
+      className={className}
+      ref={keimoRef}
+      autoplay
+      loop
+      src={animation}
+      style={{ height, width }}
+    />
   );
 }
