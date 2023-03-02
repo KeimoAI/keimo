@@ -19,9 +19,9 @@ export default function SpeakButton({ className }: Props) {
             // Simulate thinking, then speaking, then back to idling
             // console.log(sound);
             startThinking();
-            let result;
+            let res;
             try {
-                result = await fetch('/api/process-data', {
+                res = await fetch('/api/process-data', {
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(sound)
@@ -31,10 +31,16 @@ export default function SpeakButton({ className }: Props) {
             }
 
             // HOW TO DECODE PROPERLY
-            result = atob((await result?.json()).response);
-            console.log(result);
-            const audioBlob = new Blob([result], { type: "audio/mp3" });
+            res = (await res?.json());
+            const res_bin = atob(res);
+            var res_bytes = new Uint8Array(res_bin.length);
+            for (var i = 0; i < res_bin.length; i++) {
+                res_bytes[i] = res_bin.charCodeAt(i);
+            }
+            // console.log(result_decoded)
+            const audioBlob = new Blob([res_bytes], { type: "audio/mp3" });
             const audioUrl = URL.createObjectURL(audioBlob);
+            console.log(audioUrl);
             const audio = new Audio(audioUrl);
             audio.play()
 

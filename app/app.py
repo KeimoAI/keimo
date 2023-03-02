@@ -47,11 +47,10 @@ def process_data():
     print(CONVERSATION)
 
     # response to audio
-    synthesis_input = texttospeech.SynthesisInput(text="Hey, how is it going?")
+    synthesis_input = texttospeech.SynthesisInput(text=response_text)
     response_voice = client.synthesize_speech(
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
 
-    # HOW TO ENCODE PROPERLY?
-    encoded_response = base64.b64encode(response_voice.audio_content)
-    return jsonify({"response": encoded_response.decode()})
+    # print(response_voice.audio_content)
+    return jsonify(base64.b64encode(response_voice.audio_content).decode("utf-8"))
