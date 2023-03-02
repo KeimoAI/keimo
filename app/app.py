@@ -23,6 +23,7 @@ SUBJECT = {
 def SUBJECT_PROMPT(subject):
     return f"You teach about {subject} and nothing else."
 
+
 INITIAL_PROMPT = "You are an anthropomorphic half-bear half-fox character called Keimo. Your help children aged 6-12 with questions and comments. Respond to them in a fun, brief and concise manner. Use appropriate and easy to understand language for children. Use descriptive statements without bias. Generate very short responses. You are an interactive tutor that responds to questions and raises questions for the student to answer."
 
 WHISPER_PROMPT = "The transcript is about a child speaking to an anthropomorphic half-bear half-fox character called Keimo. The child asks questions about school subjects or interests they are curious about."
@@ -52,7 +53,8 @@ def process_data():
         audio.close()
         audio = open("/tmp/sound.webm", "rb")
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        transcript = openai.Audio.transcribe("whisper-1", audio, prompt=WHISPER_PROMPT).get("text")
+        transcript = openai.Audio.transcribe(
+            "whisper-1", audio, prompt=WHISPER_PROMPT).get("text")
         # c = time.time()
         # print(f"TRANSCRIPTION: {c - b}")
         print(transcript)
@@ -61,7 +63,8 @@ def process_data():
         CONVERSATION.append({"role": "user", "content": f"${transcript}"})
     else:
         transcript = ""
-        CONVERSATION.append({"role": "system", "content": SUBJECT_PROMPT(request.json["subject"])})
+        CONVERSATION.append(
+            {"role": "system", "content": SUBJECT_PROMPT(request.json["subject"])})
 
     # transcript to chatgpt
     res = openai.ChatCompletion.create(
