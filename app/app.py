@@ -15,7 +15,7 @@ audio_config = texttospeech.AudioConfig(
 )
 
 CONVERSATION = [
-    {"role": "system", "content": "You are a helpful assistant talking to a child"},
+    {"role": "system", "content": "Your name is Keimo, and you are a helpful assistant talking to a child"},
 ]
 
 app = Flask(__name__)
