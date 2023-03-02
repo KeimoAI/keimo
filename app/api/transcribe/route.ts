@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   const base64Data = sound.replace(/^data:audio\/webm;base64,/, '');
 
-  const buffer = await Buffer.from(base64Data, 'base64');
+  const buffer = Buffer.from(base64Data, 'base64');
   await fs.writeFile('/tmp/sound.webm', buffer);
 
   const openai = new OpenAIApi(config);
