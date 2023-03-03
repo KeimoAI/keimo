@@ -68,17 +68,17 @@ const TextScroller = ({ text, className, onOverflow, onScrollEdge }: Props) => {
     updateOverflow();
   }, [text, updateOverflow]);
 
-  // Keep scrolled to bottom when new text appears
-  useLayoutEffect(() => {
-    if (
-      ((!wasOverflow && isOverflow) ||
-        (prevScrollEdge === 'bottom' && scrollEdge !== 'bottom')) &&
-      ref.current
-    ) {
-      ref.current.scrollTop =
-        ref.current.scrollHeight - ref.current.clientHeight;
-    }
-  }, [wasOverflow, isOverflow, scrollEdge, ref]);
+  // // Keep scrolled to bottom when new text appears
+  // useLayoutEffect(() => {
+  //   if (
+  //     ((!wasOverflow && isOverflow) ||
+  //       (prevScrollEdge === 'bottom' && scrollEdge !== 'bottom')) &&
+  //     ref.current
+  //   ) {
+  //     ref.current.scrollTop =
+  //       ref.current.scrollHeight - ref.current.clientHeight;
+  //   }
+  // }, [wasOverflow, isOverflow, scrollEdge, ref]);
 
   const renderedText = md.render(text);
 
