@@ -1,19 +1,16 @@
 import React from 'react';
-import { data } from 'course-Images/images';
+import { data } from 'components/CourseList';
+import CourseItem from './courseItem';
 
 export default function CourseDrawer() {
   return (
     <>
-      <div className="relative flex items-center">
+      <div className="relative flex items-center bg-gradient-to-t from-blue-300 via-fuschia-400 to-blue-300">
         <div
-          id="slider"
-          className="w-full h-full overflow-x-scroll scroll whitespace-nowrap snap-center"
+          className="flex flex-row w-full h-full overflow-x-scroll scroll whitespace-nowrap snap-center"
         >
           {data.map((item) => (
-            <img
-              className="w-[220px] inline-block p-2 cursor-pointer hover:scale-105 ease-in-out duration-300"
-              src={item.img}
-              alt="/"
+            <CourseItem item={item}
             />
           ))}
         </div>
