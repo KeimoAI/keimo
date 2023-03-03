@@ -117,7 +117,7 @@ export default function SpeakButton({ className }: Props) {
 /**
  * Renders the correct icon based on the state
  */
-const renderIcon = (state: State) => {
+const renderIcon = (state: any) => {
   switch (state) {
     case State.LISTENING:
       return (
