@@ -11,47 +11,28 @@ export type Props = { className?: string };
 
 export default function SpeakButton({ className }: Props) {
   const recorder = useAudioRecorder();
-  const [state, startIdling, startListening, startSpeaking, startThinking] =
-    useKeimoStateStore(
-      (store) => [
-        store.state,
-        store.startIdling,
-        store.startListening,
-        store.startSpeaking,
-        store.startThinking,
-      ],
-      shallow
-    );
-
-  const [setUserMsg, setKeimoMsg] = useKeimoStateStore(
-    (store) => [store.setUserMsg, store.setKeimoMsg],
-    shallow
-  );
+  const { state, startIdling, startListening, startSpeaking, startThinking } =
+    useKeimoStateStore();
 
   useEffect(() => {
     recorder.onSound(async (sound) => {
       // TODO: Replace this with actual speech recognition
       // Simulate thinking, then speaking, then back to idling
       startThinking();
+      const before = new Date().getTime();
       let res;
       try {
         res = await fetch('/api/process-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sound),
+          body: JSON.stringify({ sound: sound, subject: 'history' }),
         });
       } catch (error) {
         console.error(error);
       }
 
-      res = (await res?.json()) as {
-        query: string;
-        response: { text: string; audio: string };
-      };
-      setUserMsg(res.query);
-      setKeimoMsg(res.response.text);
-
-      const res_bin = atob(res.response.audio);
+      res = await res?.json();
+      const res_bin = atob(res);
       var res_bytes = new Uint8Array(res_bin.length);
       for (var i = 0; i < res_bin.length; i++) {
         res_bytes[i] = res_bin.charCodeAt(i);
@@ -59,14 +40,19 @@ export default function SpeakButton({ className }: Props) {
       const audioBlob = new Blob([res_bytes], { type: 'audio/ogg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      audio.playbackRate = 2.0;
+      audio.play();
+      const after = new Date().getTime();
+      console.log('WHOLE: ' + (after - before).toString());
 
-      startSpeaking();
-      audio.addEventListener('ended', () => {
+      setTimeout(() => {
+        startSpeaking();
+      }, 2000);
+      setTimeout(() => {
         startIdling();
-      });
-      await audio.play();
+      }, 4000);
     });
-  }, [setUserMsg, setKeimoMsg]);
+  }, []);
 
   useEffect(() => {
     switch (state) {
