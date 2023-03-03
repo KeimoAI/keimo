@@ -61,8 +61,10 @@ export default function SpeakButton({ className }: Props) {
       const audio = new Audio(audioUrl);
 
       startSpeaking();
+      audio.addEventListener('ended', () => {
+        startIdling();
+      });
       await audio.play();
-      startIdling();
     });
   }, [setUserMsg, setKeimoMsg]);
 
