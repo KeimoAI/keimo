@@ -18,10 +18,10 @@ export default function Home() {
       <div
         className={`${styles.bg} w-full h-full absolute -z-50 overflow-hidden`}
       />
-      <Keimo className="self-end" width={600} />
+      <Keimo className="self-end" width={800} />
       <div className="w-full flex-1 flex flex-col justify-end pb-6 pr-6">
         <SpeechBubble
-          className="w-96 mb-4"
+          className="w-96 mb-4 max-h-[24rem]"
           point={{
             offset: { left: 1 },
             width: 50,
@@ -34,7 +34,7 @@ export default function Home() {
           resetTick={0}
         />
         <SpeechBubble
-          className="mr-[5rem] w-80 mb-14 self-end"
+          className="mr-[5rem] w-80 mb-14 max-h-[24rem] self-end"
           point={{
             offset: { right: 1 },
             width: 50,
