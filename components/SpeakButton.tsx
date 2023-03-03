@@ -8,6 +8,7 @@ import useKeimoStateStore, { State } from 'store/keimoStateStore';
 import useAudioRecorder from 'lib/AudioRecorder';
 
 export type Props = { className?: string };
+let audio: HTMLAudioElement;
 
 export default function SpeakButton({ className }: Props) {
   const recorder = useAudioRecorder();
@@ -38,7 +39,7 @@ export default function SpeakButton({ className }: Props) {
         res = await fetch('/api/process-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sound),
+          body: JSON.stringify({ sound: sound, subject: null }),
         });
       } catch (error) {
         console.error(error);
@@ -58,7 +59,7 @@ export default function SpeakButton({ className }: Props) {
       }
       const audioBlob = new Blob([res_bytes], { type: 'audio/ogg' });
       const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      audio = new Audio(audioUrl);
 
       startSpeaking();
       audio.addEventListener('ended', () => {
@@ -82,6 +83,13 @@ export default function SpeakButton({ className }: Props) {
     // Change the state to listening
     if (state === State.IDLE) {
       startListening();
+    }
+
+    if (state === State.SPEAKING) {
+      console.log(state)
+      startListening();
+      audio.pause();
+      console.log(state)
     }
 
     // Listening -> Thinking

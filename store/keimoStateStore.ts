@@ -49,7 +49,7 @@ const useKeimoStateStore = create(
 
     startListening: () =>
       set((store) => {
-        if (store.state === State.IDLE) {
+        if (store.state === State.IDLE || store.state === State.SPEAKING) {
           store.state = State.LISTENING;
         } else {
           console.error(
