@@ -11,6 +11,10 @@ import {
   useLayoutEffect,
 } from 'react';
 
+import { Remarkable } from 'remarkable';
+
+const md = new Remarkable();
+
 const usePrevious = <T,>(value: T): T | undefined => {
   const ref = useRef<T | undefined>();
   useEffect(() => {
@@ -76,14 +80,15 @@ const TextScroller = ({ text, className, onOverflow, onScrollEdge }: Props) => {
     }
   }, [wasOverflow, isOverflow, scrollEdge, ref]);
 
+  const renderedText = md.render(text);
+
   return (
-    <p
+    <div
       className={`overflow-y-auto ${className}`}
       onScroll={updateOverflow}
       ref={ref}
-    >
-      {text}
-    </p>
+      dangerouslySetInnerHTML={{ __html: renderedText }}
+    />
   );
 };
 
