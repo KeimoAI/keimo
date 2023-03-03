@@ -153,7 +153,7 @@ const SpeechBubble = ({
           onOverflow={setIsOverflow}
           onScrollEdge={setScrollEdge}
           text={text}
-          className="min-h-[1rem] flex-1 w-full overflow-y-auto"
+          className="min-h-[1rem] p-1 flex-1 w-full overflow-y-auto"
         />
         <Pointy
           borderWidth={borderWidth}
