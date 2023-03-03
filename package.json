@@ -10,8 +10,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@lottiefiles/react-lottie-player": "^3.5.2",
     "@google-cloud/text-to-speech": "^4.2.1",
+    "@lottiefiles/react-lottie-player": "^3.5.2",
     "@types/node": "18.14.1",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
