@@ -23,6 +23,11 @@ export default function SpeakButton({ className }: Props) {
       shallow
     );
 
+  const [setUserMsg, setKeimoMsg] = useKeimoStateStore(
+    (store) => [store.setUserMsg, store.setKeimoMsg],
+    shallow
+  );
+
   useEffect(() => {
     recorder.onSound(async (sound) => {
       // TODO: Replace this with actual speech recognition
@@ -39,8 +44,14 @@ export default function SpeakButton({ className }: Props) {
         console.error(error);
       }
 
-      res = await res?.json();
-      const res_bin = atob(res);
+      res = (await res?.json()) as {
+        query: string;
+        response: { text: string; audio: string };
+      };
+      setUserMsg(res.query);
+      setKeimoMsg(res.response.text);
+
+      const res_bin = atob(res.response.audio);
       var res_bytes = new Uint8Array(res_bin.length);
       for (var i = 0; i < res_bin.length; i++) {
         res_bytes[i] = res_bin.charCodeAt(i);
@@ -48,16 +59,12 @@ export default function SpeakButton({ className }: Props) {
       const audioBlob = new Blob([res_bytes], { type: 'audio/ogg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
-      audio.play();
 
-      setTimeout(() => {
-        startSpeaking();
-      }, 2000);
-      setTimeout(() => {
-        startIdling();
-      }, 4000);
+      startSpeaking();
+      await audio.play();
+      startIdling();
     });
-  }, []);
+  }, [setUserMsg, setKeimoMsg]);
 
   useEffect(() => {
     switch (state) {

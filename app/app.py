@@ -51,4 +51,10 @@ def process_data():
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
 
-    return jsonify(base64.b64encode(response_voice.audio_content).decode("utf-8"))
+    return jsonify({
+        'query': transcript,
+        'response': {
+            'audio': base64.b64encode(response_voice.audio_content).decode("utf-8"),
+            'text': response_text,
+        }
+    })
