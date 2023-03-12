@@ -2,6 +2,7 @@ import { Configuration, OpenAIApi } from 'openai';
 import fs from 'fs/promises';
 import { createReadStream } from 'fs';
 import textToSpeech from '@google-cloud/text-to-speech';
+import { NextResponse as Response } from 'next/server';
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -57,7 +58,9 @@ export async function POST(request: Request) {
 
   console.log(speechResponse);
   // Turn speechResponse into a base64 string
-  const base64 = speechResponse.audioContent?.toString('base64');
+  const base64 = Buffer.from(speechResponse.audioContent as string).toString(
+    'base64'
+  );
 
   return Response.json({
     query,
