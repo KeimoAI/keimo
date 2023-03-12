@@ -66,7 +66,11 @@ export async function POST(request: Request) {
 
   const [speechResponse] = await textToSpeechClient.synthesizeSpeech({
     input: { text: answer?.content },
-    voice: { languageCode: 'en-US', ssmlGender: 'FEMALE' },
+    voice: {
+      languageCode: 'en-US',
+      ssmlGender: 'FEMALE',
+      name: 'en-US-Neural2-H',
+    },
     audioConfig: { audioEncoding: 'OGG_OPUS' },
   });
 
