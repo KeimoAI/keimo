@@ -33,10 +33,11 @@ export default function SpeakButton({ className }: Props) {
     recorder.onSound(async (sound) => {
       // TODO: Replace this with actual speech recognition
       // Simulate thinking, then speaking, then back to idling
+      console.log(sound);
       startThinking();
       let res;
       try {
-        res = await fetch('/api/process-data', {
+        res = await fetch('/api/transcribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sound: sound, subject: null }),
@@ -51,6 +52,8 @@ export default function SpeakButton({ className }: Props) {
       };
       setUserMsg(res.query);
       setKeimoMsg(res.response.text);
+
+      console.log(res.response.audio);
 
       const res_bin = atob(res.response.audio);
       var res_bytes = new Uint8Array(res_bin.length);
@@ -86,10 +89,10 @@ export default function SpeakButton({ className }: Props) {
     }
 
     if (state === State.SPEAKING) {
-      console.log(state)
+      console.log(state);
       startListening();
       audio.pause();
-      console.log(state)
+      console.log(state);
     }
 
     // Listening -> Thinking
